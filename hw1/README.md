@@ -49,5 +49,7 @@ and if you use a key value of 53 the key value will be 1.
 
 ### Cracking Caesar
 If *caesar* is run in decrypt mode without a key value, it will attempt to crack
-the cipher using the Chi-squared test on the known frequency analysis values of
-the English language.
+the cipher using the [Chi-squared
+test](https://en.wikipedia.org/wiki/Chi-squared_test) on the known [frequency
+analysis values of the English
+language](https://en.wikipedia.org/wiki/Letter_frequency).
