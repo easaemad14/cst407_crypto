@@ -12,6 +12,8 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <cctype>
+#include <cerrno>
 
 #include "encrypt.hpp"
 
@@ -44,6 +46,11 @@ static string ct_file;                // Path to the cipher text file
 	exit(exVal);
 }
 
+constexpr void getKeyValFromChar(char c)
+{
+	key_val = tolower(c) - 'a';
+}
+
 // Parse the command line and ensure all variables are set
 void parse(int cnt, char** vect)
 {
@@ -59,16 +66,21 @@ void parse(int cnt, char** vect)
 			try {
 				key_val = stoi(vect[++i]);
 			} catch(...) {
-				cerr << "Invalid key value: " << vect[i] << endl;
-				printHelp();
+				if(not isalpha(vect[i][0])) {
+					cerr << "Invalid key value: " << vect[i] << endl;
+					printHelp();
+				}
+				getKeyValFromChar(vect[i][0]);
 			}
 		} else if(0 == strcmp("-p", vect[i])) {
 			if(i + 1 == cnt) {
+				cerr << "No file name after -p flag" << endl;
 				printHelp();
 			}
 			pt_file = vect[++i];
 		} else if(0 == strcmp("-c", vect[i])) {
 			if(i + 1 == cnt) {
+				cerr << "No file name after -c flag" << endl;
 				printHelp();
 			}
 			ct_file = vect[++i];
@@ -78,24 +90,37 @@ void parse(int cnt, char** vect)
 		}
 	}
 
-	// If we are encrypting, a key value is needed
-	while(enc and not key_val) {
+	// Ensure we have all needed variables set
+	if(enc) {
 		string buf;
-		clog << "Please input key value for encryption: ";
+		clog << "Are you sure you want to encrypt [Y/n]: ";
+		getline(cin, buf);
+		if(buf[0] == 'n' or buf[0] == 'N') {
+			enc = false;
+		}
+	}
+
+	if(not key_val) {
+		string buf;
+		clog << "Please input key value for encryption (if known): ";
 		getline(cin, buf);
 		try {
 			key_val = stoi(buf);
 		} catch(...) {
-			clog << "Invalid key value: " << buf << endl;
+			if(enc and not isalpha(buf[0])) {
+				cerr << "Invalid key value: " << buf << endl;
+				printHelp();
+			}
+			getKeyValFromChar(buf[0]);
 		}
 	}
 
-	if(enc and pt_file.empty()) {
+	if(pt_file.empty()) {
 		clog << "Please enter path to plain text file: ";
 		getline(cin, pt_file);
 	}
 
-	if(not enc and ct_file.empty()) {
+	if(ct_file.empty()) {
 		clog << "Please enter cipher text file: ";
 		getline(cin, ct_file);
 	}
@@ -106,12 +131,18 @@ int main(int argc, char** argv)
 	auto retVal{0};
 	parse(argc, argv);
 
+	// Call the correct function based off of the passed variables
 	if(enc) {                        // Just encrypt the file
-		retVal = encryptFile(pt_file, key_val);
+		if(not key_val) {
+			cerr << "Can not encrypt without a key value!" << endl;
+			retVal = -EINVAL;
+		} else {
+			retVal = encryptFile(pt_file, ct_file, key_val);
+		}
 	} else if(not enc and key_val) { // Decrypting with known key
-		retVal = decryptFile(ct_file, key_val);
+		retVal = decryptFile(ct_file, pt_file, key_val);
 	} else {                         // Need to crack the cipher
-		retVal = crackFile(ct_file);
+		retVal = crackFile(ct_file, pt_file);
 	}
 
 	return retVal;

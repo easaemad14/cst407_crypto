@@ -27,21 +27,34 @@ constexpr auto lower_offset{97};
 /**
  * Functions
  */
-// Encrypt a file with the key value offset
-// Ciphertext is written to file.ct
-// Returns zero on success, else errno
-int encryptFile(const string& file, const int key)
+// Ensure the key offset is valid
+constexpr void safeKeyOffset(int key)
 {
-	ifstream ifs(file);
-	ofstream ofs(file + ".ct"s);
+	while(key < 0) {
+		key += alpha_size;
+	}
+	key = key % alpha_size;
+}
 
-	if(not ifs.is_open() or not ofs.is_open()) {
-		cerr << "Could not open files!" << endl;
+// Encrypt ifile to ofile using key offset
+// Returns zero on success, else errno
+int encryptFile(const string& ifile, const string& ofile, const int key)
+{
+	ifstream ifs(ifile);
+	if(not ifs.is_open()) {
+		cerr << "Could not open plain text file!" << endl;
+		return -ENOENT;
+	}
+
+	ofstream ofs(ofile);
+	if(not ofs.is_open()) {
+		cerr << "Could not open cipher text file!" << endl;
 		return -ENOENT;
 	}
 
 	// Read the file and do a little magic
 	string buf; // Create a mutable buffer
+	safeKeyOffset(key); // Ensure the key is valid offset
 	while(getline(ifs, buf)) {
 		for(auto c = buf.begin(); c not_eq buf.end(); c++) {
 			// Ensure we are only operating on alphabetic characters
@@ -62,19 +75,23 @@ int encryptFile(const string& file, const int key)
 	return 0;
 }
 
-// Decrypt a file with the key value offset
-// Plaintext is written to file.pt
-int decryptFile(const string& file, const int key)
+// Decrypt ifile to ofile with key offset
+int decryptFile(const string& ifile, const string& ofile, const int key)
 {
-	ifstream ifs(file);
-	ofstream ofs(file + ".pt"s);
+	ifstream ifs(ifile);
+	if(not ifs.is_open()) {
+		cerr << "Could not open cipher text file!" << endl;
+		return -ENOENT;
+	}
 
-	if(not ifs.is_open() or not ofs.is_open()) {
-		cerr << "Could not open files!" << endl;
+	ofstream ofs(ofile);
+	if(not ofs.is_open()) {
+		cerr << "Could not open plain text file!" << endl;
 		return -ENOENT;
 	}
 
 	string buf;
+	safeKeyOffset(key);
 	while(getline(ifs, buf)) {
 		for(auto c = buf.begin(); c not_eq buf.end(); c++) {
 			if(not isalpha(*c)) {
@@ -92,9 +109,9 @@ int decryptFile(const string& file, const int key)
 	return 0;
 }
 
-// Attempt to crack a file, writing the best match to file.crack
+// Attempt to crack ifile, writing the best match to ofile
 // file.dat will contain the frequency analysis data
-int crackFile(const string& /* file */)
+int crackFile(const string&, const string&)
 {
 	clog << "Cracking is not available yet.... Come back soon" << endl;
 	return 0;

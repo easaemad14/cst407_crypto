@@ -8,6 +8,6 @@
  ******************************************************************************/
 #include <string>
 
-int encryptFile(const std::string&, const int);
-int decryptFile(const std::string&, const int);
-int crackFile(const std::string&);
+int encryptFile(const std::string&, const std::string&, const int);
+int decryptFile(const std::string&, const std::string&, const int);
+int crackFile(const std::string&, const std::string&);
