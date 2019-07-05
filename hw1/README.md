@@ -53,3 +53,13 @@ the cipher using the [Chi-squared
 test](https://en.wikipedia.org/wiki/Chi-squared_test) on the known [frequency
 analysis values of the English
 language](https://en.wikipedia.org/wiki/Letter_frequency).
+
+In order to be successful, your ciphertext will need to be fairly large with a
+good amount of variability of characters for this to work. There are several
+examples provided in the tests/ directory.
+
+When attempting to crack a cipher, *caesar* will generate an vector of character
+counts and measure the error between the expected frequency analysis map and the
+generated vector. This is done for each possible offset, generating a
+Chi-squared value for each offset with the following function:
+`sum((observed - expected)^2/expected)`
