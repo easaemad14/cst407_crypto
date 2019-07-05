@@ -111,7 +111,9 @@ void parse(int cnt, char** vect)
 				cerr << "Invalid key value: " << buf << endl;
 				printHelp();
 			}
-			getKeyValFromChar(buf[0]);
+			if(isalpha(buf[0])) {
+				getKeyValFromChar(buf[0]);
+			}
 		}
 	}
 
@@ -137,11 +139,16 @@ int main(int argc, char** argv)
 			cerr << "Can not encrypt without a key value!" << endl;
 			retVal = -EINVAL;
 		} else {
+			clog << "Encrypting file " << pt_file << " with known key value: " <<
+				key_val << endl;
 			retVal = encryptFile(pt_file, ct_file, key_val);
 		}
 	} else if(not enc and key_val) { // Decrypting with known key
+			clog << "Decrypting file " << ct_file << " with known key value: " <<
+				key_val << endl;
 		retVal = decryptFile(ct_file, pt_file, key_val);
 	} else {                         // Need to crack the cipher
+			clog << "Decrypting file " << ct_file << " with unknown key value\n";
 		retVal = crackFile(ct_file, pt_file);
 	}
 
