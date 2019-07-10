@@ -64,15 +64,15 @@ int encryptFile(const string& ifile, const string& ofile, const int key)
 	string buf; // Create a mutable buffer
 	safeKeyOffset(key); // Ensure the key is valid offset
 	while(getline(ifs, buf)) {
-		for(auto c = buf.begin(); c not_eq buf.end(); c++) {
+		for(auto& c : buf) {
 			// Ensure we are only operating on alphabetic characters
-			if(not isalpha(*c)) {
+			if(not isalpha(c)) {
 				continue;
 			}
 
 			// Magic goes here
-			*c = toupper(*c);
-			*c = ((*c - upper_offset) + key) % alpha_size + upper_offset;
+			c = toupper(c);
+			c = ((c - upper_offset) + key) % alpha_size + upper_offset;
 		}
 
 		// Write the block to the cipher text file
@@ -101,13 +101,13 @@ int decryptFile(const string& ifile, const string& ofile, const int key)
 	string buf;
 	safeKeyOffset(key);
 	while(getline(ifs, buf)) {
-		for(auto c = buf.begin(); c not_eq buf.end(); c++) {
-			if(not isalpha(*c)) {
+		for(auto& c : buf) {
+			if(not isalpha(c)) {
 				continue;
 			}
 
-			*c = tolower(*c);
-			*c = ((*c - lower_offset) - key + alpha_size) % alpha_size + lower_offset;
+			c = tolower(c);
+			c = ((c - lower_offset) - key + alpha_size) % alpha_size + lower_offset;
 		}
 
 		ofs << buf;
@@ -132,13 +132,13 @@ int crackFile(const string& ifile, const string& ofile)
 	string buf;
 
 	while(getline(ifs, buf)) {
-		for(auto c = buf.begin(); c not_eq buf.end(); c++) {
-			if(not isalpha(*c)) {
+		for(auto& c : buf) {
+			if(not isalpha(c)) {
 				continue;
 			}
 
 			// Increment our cnt array
-			chars[tolower(*c) - lower_offset]++;
+			chars[tolower(c) - lower_offset]++;
 			cnt++; // Keep track of alphabetic characters
 		}
 	}
