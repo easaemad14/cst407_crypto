@@ -85,18 +85,21 @@ string p4(const string& k)
 }
 
 // Circular left shift on string k
-string cls(const string& k)
+string cls(const string& k, int num)
 {
 	string retVal;
-	retVal = k.substr(1);
-	retVal.push_back(k.at(0));
+	for(auto i{0}; i < num; i++) {
+		retVal = k.substr(1);
+		retVal.push_back(k.at(0));
+	}
+
 	return retVal;
 }
 
 // Circular left shift on each half of input
-string shift(const string& k)
+string shift(const string& k, int num = 1)
 {
-	return cls(k.substr(0, 5)) + cls(k.substr(5));
+	return cls(k.substr(0, 5), num) + cls(k.substr(5), num);
 }
 
 // Generate key values
@@ -107,7 +110,7 @@ void genKey1()
 
 void genKey2()
 {
-	k2 = p8(shift(shift(p10(key))));
+	k2 = p8(shift(shift(p10(key)), 2));
 }
 
 // Initial permutation
