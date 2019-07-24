@@ -252,7 +252,7 @@ int main(int, char**)
 	clog << "10-bit binary key: ";
 	getline(cin, key);
 	if(not isValidInput(key, 10)) {
-		cerr << "Input must be 8 bits and only contains 1s and 0s!" << endl;
+		cerr << "Input must be 10 bits and only contains 1s and 0s!" << endl;
 		retVal = -EINVAL;
 		goto exit;
 	}
