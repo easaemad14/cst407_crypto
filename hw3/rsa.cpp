@@ -26,6 +26,20 @@ bool isProbablyPrime(const ul n)
 	return (rem == 1ul ? true : false);
 }
 
+// Check that n is definitely prime
+bool isDefinitelyPrime(const ul n)
+{
+	auto retVal{true};
+	for(auto i = static_cast<ul>(sqrtl(n)); i > 1; i--) {
+		if(n % i == 0) {
+			retVal = false;
+			break;
+		}
+	}
+
+	return retVal;
+}
+
 // Factor n from two primes p and q
 bool factorNumber(const ul n, ul& p, ul& q)
 {
@@ -70,4 +84,32 @@ ul gcd(const ul a, const ul b)
 ul igcd(const ul, const ul)
 {
 	return 0ul;
+}
+
+// Generate a prime, starting at start
+ul genPrime(const ul start)
+{
+	auto retVal{0ul};
+	for(auto i{start}; i not_eq 0; i++) {
+		if(isDefinitelyPrime(i)) {
+			retVal = i;
+			break;
+		}
+	}
+
+	return retVal;
+}
+
+// Return coprime of val within min and max (exclusively)
+ul genCoprime(const ul val, const ul min, const ul max)
+{
+	auto retVal{0ul};
+	for(auto i{min + 1}; i < max; i++) {
+		if(gcd(i, val) == 1ul) {
+			retVal = i;
+			break;
+		}
+	}
+
+	return retVal;
 }
