@@ -33,7 +33,7 @@ unsigned long getValueFromUser(string message)
 int main(int, char**)
 {
 	//auto enc{true};
-	unsigned long n, e; //, p, q, e, val;
+	unsigned long n, e, p, q; //, val;
 	string buf;
 
 	// Are we encrypting?
@@ -48,13 +48,16 @@ int main(int, char**)
 	//		(enc ? "plaintext"s : "ciphertext"s) + ": "s);
 
 	if((n > 0) and (e > 0)) {
-#if 1
-		clog << "n is " << (isProbablyPrime(n) ? "probably" : "not") <<
-			" prime" << endl;
-		clog << "e is " << (isProbablyPrime(e) ? "probably" : "not") <<
-			" prime" << endl;
-#endif
+		clog << "Factoring... this may take a while" << endl;
+		if(factorNumber(n, p, q)) {
+			clog << "n value: " << to_string(n) << endl;
+			clog << "p value: " << to_string(p) << endl;
+			clog << "q value: " << to_string(q) << endl;
+		}
 	}
 
+#if 1
+	clog << "gcd of n and e: " << gcd(n, e) << endl;
+#endif
 	return 0;
 }

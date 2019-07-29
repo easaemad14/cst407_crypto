@@ -7,7 +7,7 @@
  * Description: RSA (helper) functions
  ******************************************************************************/
 
-bool isProbablyPrime(unsigned long);
-bool factorNumber(unsigned long, unsigned long&, unsigned long&);
-unsigned long gcd(unsigned long, unsigned long);
-unsigned long igcd(unsigned long, unsigned long);
+bool isProbablyPrime(const unsigned long);
+bool factorNumber(const unsigned long, unsigned long&, unsigned long&);
+unsigned long gcd(const unsigned long, const unsigned long);
+unsigned long igcd(const unsigned long, const unsigned long);
