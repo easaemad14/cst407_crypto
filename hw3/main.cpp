@@ -16,7 +16,7 @@ using namespace std;
 
 
 auto gen_keys{false}, encrypt{false}, decrypt{false};
-auto value{0ul}, seed{0ul};
+auto seed{0ul};
 mt19937 rng;
 
 
@@ -26,8 +26,8 @@ mt19937 rng;
 	clog << "\t-h: Print this help menu" << endl;
 	clog << "\t-g: Generate RSA keys using seed value" << endl;
 	clog << "\t\tIf no seed provided, time will be used" << endl;
-	clog << "\t-e: Encrypt value val" << endl;
-	clog << "\t-d: Decrypt value val" << endl;
+	clog << "\t-e: Encrypt mode" << endl;
+	clog << "\t-d: Decrypt mode" << endl;
 
 	exit(exVal);
 }
@@ -49,27 +49,9 @@ void parse(int cnt, char** vect)
 				}
 			}
 		} else if(0 == strcmp("-e", vect[i])) {
-			if(i + 1 == cnt) {
-				printHelp();
-			}
-			try {
-				value = stol(vect[++i]);
-				encrypt = true;
-			} catch(...) {
-				cerr << "Invalid encryption value: " << vect[i] << endl;
-				printHelp();
-			}
+			encrypt = true;
 		} else if(0 == strcmp("-d", vect[i])) {
-			if(i + 1 == cnt) {
-				printHelp();
-			}
-			try {
-				value = stol(vect[++i]);
-				decrypt = true;
-			} catch(...) {
-				cerr << "Invalid decryption value: " << vect[i] << endl;
-				printHelp();
-			}
+			decrypt = true;
 		} else {
 			cerr << "Invalid option!" << endl;
 			printHelp();
@@ -116,14 +98,14 @@ int main(int argc, char** argv)
 	auto retVal{0};
 	parse(argc, argv);
 
-	// Seed our RNG
-	if(not seed) {
-		seed = time(nullptr);
-	}
-	clog << "Using seed value: " << to_string(seed) << endl;
-	rng.seed(seed);
-
 	if(gen_keys) {
+		// Seed our RNG
+		if(not seed) {
+			seed = time(nullptr);
+		}
+		clog << "Using seed value: " << to_string(seed) << endl;
+		rng.seed(seed);
+
 		clog << "Generating keys. . ." << endl;
 		genKeyValues(3);
 	}
@@ -132,20 +114,31 @@ int main(int argc, char** argv)
 		clog << "Encrypting..." << endl;
 		auto n = getValueFromUser("Please provide n value: "s);
 		auto e = getValueFromUser("Please provide e value: "s);
+		auto p = getValueFromUser("Please enter plaintext: "s);
 
-		if((n > 0) and (e > 0)) {
-			clog << "Factoring... this may take a while" << endl;
-			auto p{0ul}, q{0ul};
-			if(factorNumber(n, p, q)) {
-				clog << "n value: " << to_string(n) << endl;
-				clog << "p value: " << to_string(p) << endl;
-				clog << "q value: " << to_string(q) << endl;
+		if((n > 0) and (e > 0) and (p > 0) and (p < n)) {
+			auto t = getTotient(n);
+			if((t > 0ul) and (gcd(e, t) == 1ul)) {
+				clog << "Ciphertext: " << powMod(p, e, n) << endl;
 			}
 		}
 	}
 
 	if(decrypt) {
 		clog << "Decrypting..." << endl;
+		auto n = getValueFromUser("Please provide n value: "s);
+		auto e = getValueFromUser("Please provide e value: "s);
+		auto c = getValueFromUser("Please enter ciphertext: "s);
+
+		if((n > 0) and (e > 0) and (c > 0) and (c < n)) {
+			auto t = getTotient(n);
+			if((t > 0ul) and (gcd(e, t) == 1ul)) {
+				auto d = igcd(e, t, 0, n);
+				if(d > 0ul) {
+					clog << "Ciphertext: " << powMod(c, d, n) << endl;
+				}
+			}
+		}
 	}
 
 	return retVal;

@@ -13,17 +13,23 @@ using namespace std;
 using ul = unsigned long;
 
 
+// Compute a^b mod n with very large numbers
+unsigned long powMod(const ul a, const ul b, const ul n)
+{
+	auto retVal{1ul};
+	for(auto i{0ul}; i < b; i++) {
+		retVal = retVal * a % n;
+	}
+
+	return retVal;
+}
+
 // Uses Fermat's little theorem to guess primality
 bool isProbablyPrime(const ul n)
 {
 	// a^(p-1) cong 1 mod p; using 2 for a
 	// Three will fail due to 3-1==2, but 3 is prime
-	auto rem{1ul};
-	for(auto i{0ul}; i < n - 1; i++) {
-		rem = rem * 2ul % n;
-	}
-
-	return (rem == 1ul ? true : false);
+	return (powMod(2, n - 1, n) == 1ul ? true : false);
 }
 
 // Check that n is definitely prime
@@ -63,6 +69,12 @@ bool factorNumber(const ul n, ul& p, ul& q)
 	return retVal;
 }
 
+// Calculate Least Common Multiple of a and b
+ul lcm(const ul a, const ul b)
+{
+	return (a * b / gcd(a, b));
+}
+
 // Calculate Greatest Common Divisor (GCD) of two values a and b
 // This is not a very efficient algorithm. . .
 ul gcd(const ul a, const ul b)
@@ -81,9 +93,19 @@ ul gcd(const ul a, const ul b)
 	return retVal;
 }
 
-ul igcd(const ul, const ul)
+// Generate modular multiplicative inverse of a, with respect to m
+// Min and max values are inclusive
+ul igcd(const ul a, const ul m, const ul min, const ul max)
 {
-	return 0ul;
+	auto retVal{0ul};
+	for(auto i{min}; i <= max; i++) {
+		if(a*i % m == 1ul) {
+			retVal = i;
+			break;
+		}
+	}
+
+	return retVal;
 }
 
 // Generate a prime, starting at start
@@ -109,6 +131,18 @@ ul genCoprime(const ul val, const ul min, const ul max)
 			retVal = i;
 			break;
 		}
+	}
+
+	return retVal;
+}
+
+// Get Euler's Totient value from product of two primes (n)
+ul getTotient(const ul n)
+{
+	auto p{0ul}, q{0ul}, retVal{0ul};
+	if(factorNumber(n, p, q)) {
+		retVal = lcm((p-1),(q-1));
+		//retVal = (p-1)*(q-1);
 	}
 
 	return retVal;
