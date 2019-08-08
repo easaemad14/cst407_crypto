@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 			if((t > 0ul) and (gcd(e, t) == 1ul)) {
 				auto d = igcd(e, t, 0, n);
 				if(d > 0ul) {
-					clog << "Ciphertext: " << powMod(c, d, n) << endl;
+					clog << "Plaintext: " << powMod(c, d, n) << endl;
 				}
 			}
 		}
