@@ -89,7 +89,9 @@ void genKeyValues(unsigned int n)
 		auto q = genPrime(rng() % 90000 + 10000ul);
 		auto t = (p - 1) * (q - 1);
 		auto e = genCoprime(t, rng() % 90000 + 10000ul, t);
-		clog << "n: " << to_string(p*q) << ", e: " << to_string(e) << endl;
+		auto d = igcd(e, t, 0, p*q);
+		clog << "n: " << to_string(p*q) << ", e: " << to_string(e) <<
+			", d: " << to_string(d) << endl;
 	}
 }
 
@@ -127,16 +129,16 @@ int main(int argc, char** argv)
 	if(decrypt) {
 		clog << "Decrypting..." << endl;
 		auto n = getValueFromUser("Please provide n value: "s);
-		auto e = getValueFromUser("Please provide e value: "s);
+		auto d = getValueFromUser("Please provide d value: "s);
 		auto c = getValueFromUser("Please enter ciphertext: "s);
 
-		if((n > 0) and (e > 0) and (c > 0) and (c < n)) {
+		if((n > 0) and (d > 0) and (c > 0) and (c < n)) {
 			auto t = getTotient(n);
-			if((t > 0ul) and (gcd(e, t) == 1ul)) {
-				auto d = igcd(e, t, 0, n);
-				if(d > 0ul) {
+			if((t > 0ul) /* and (gcd(e, t) == 1ul) */ ) {
+				//auto d = igcd(e, t, 0, n);
+				//if(d > 0ul) {
 					clog << "Plaintext: " << powMod(c, d, n) << endl;
-				}
+				//}
 			}
 		}
 	}
